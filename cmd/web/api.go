@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/mznrasil/my-blogs-be/internal/middleware"
+	"github.com/mznrasil/my-blogs-be/internal/services/payments"
 	"github.com/mznrasil/my-blogs-be/internal/services/posts"
 	"github.com/mznrasil/my-blogs-be/internal/services/sites"
 	"github.com/mznrasil/my-blogs-be/internal/services/subscriptions"
@@ -46,6 +47,10 @@ func (s *APIServer) Run() {
 	subscriptionsStore := subscriptions.NewStore(s.db)
 	subscriptionsHandler := subscriptions.NewHandler(subscriptionsStore)
 	subscriptionsHandler.RegisterRoutes(subRouter)
+
+	paymentsStore := payments.NewStore(s.db)
+	paymentsHandler := payments.NewHandler(paymentsStore)
+	paymentsHandler.RegisterRoutes(subRouter)
 
 	log.Println("Server Listening on PORT", s.addr)
 	http.ListenAndServe(s.addr, subRouter)

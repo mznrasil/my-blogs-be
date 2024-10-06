@@ -4,38 +4,85 @@ import (
 	"time"
 )
 
+type Payment struct {
+	Id            string    `json:"id"`
+	Pidx          string    `json:"pidx"`
+	Status        string    `json:"status"`
+	TransactionId string    `json:"transaction_id"`
+	Amount        float64   `json:"amount"`
+	Mobile        string    `json:"mobile"`
+	TotalAmount   float64   `json:"total_amount"`
+	PlanId        int       `json:"plan_id"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+}
+
+type UpdatePaymentKhaltiPayload struct {
+	Pidx          string  `json:"pidx"           validate:"required"`
+	TransactionId string  `json:"transaction_id" validate:"required"`
+	Amount        float64 `json:"amount"         validate:"required"`
+	TotalAmount   float64 `json:"total_amount"   validate:"required"`
+	Mobile        string  `json:"mobile"         validate:"required"`
+	Status        string  `json:"status"         validate:"required"`
+	PlanId        int     `json:"plan_id"        validate:"required"`
+}
+
+type CustomerInfo struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
+type InitiatePaymentKhaltiPayload struct {
+	ReturnUrl         string       `json:"return_url"`
+	WebsiteUrl        string       `json:"website_url"`
+	Amount            string       `json:"amount"`
+	PurchaseOrderID   string       `json:"purchase_order_id"`
+	PurchaseOrderName string       `json:"purchase_order_name"`
+	CustomerInfo      CustomerInfo `json:"customer_info"`
+}
+
+type InitiatePaymentPayload struct {
+	Pidx   string `json:"pidx"`
+	Status string `json:"status"`
+}
+
+type KhaltiPaymentResponse struct {
+	Pidx       string `json:"pidx"`
+	PaymentUrl string `json:"payment_url"`
+	ExpiresAt  string `json:"expires_at"`
+	ExpiresIn  int    `json:"expires_in"`
+}
+
+type PaymentStore interface {
+	InitiatePayment(data InitiatePaymentPayload) error
+	GetPlanById(id int) (*Plan, error)
+	GetUserByID(id string) (*User, error)
+	UpdatePayment(userID string, payload UpdatePaymentKhaltiPayload) error
+}
+
+type Plan struct {
+	ID        int       `json:"id"`
+	PlanName  string    `json:"plan_name"`
+	Amount    float64   `json:"amount"`
+	Interval  string    `json:"interval"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 type Subscription struct {
-	StripeSubscriptionId string    `json:"stripe_subscription_id"`
-	Interval             string    `json:"interval"`
-	Status               string    `json:"status"`
-	PlanId               string    `json:"plan_id"`
-	CurrentPeriodStart   int       `json:"current_period_start"`
-	CurrentPeriodEnd     int       `json:"current_period_end"`
-	CreatedAt            time.Time `json:"created_at"`
-	UpdatedAt            time.Time `json:"updated_at"`
-	UserId               string    `json:"user_id"`
-}
-
-type CreateSubscriptionPayload struct {
-	StripeSubscriptionId string `json:"stripe_subscription_id" validate:"required"`
-	Interval             string `json:"interval"               validate:"required"`
-	Status               string `json:"status"                 validate:"required"`
-	PlanId               string `json:"plan_id"                validate:"required"`
-	CurrentPeriodStart   int    `json:"current_period_start"   validate:"required"`
-	CurrentPeriodEnd     int    `json:"current_period_end"     validate:"required"`
-}
-
-type UpdateSubscriptionPayload struct {
-	PlanId             string `json:"plan_id"              validate:"required"`
-	CurrentPeriodStart int    `json:"current_period_start" validate:"required"`
-	CurrentPeriodEnd   int    `json:"current_period_end"   validate:"required"`
-	Status             string `json:"status"               validate:"required"`
+	Id        string    `json:"id"`
+	StartDate time.Time `json:"start_date"`
+	EndDate   time.Time `json:"end_date"`
+	UserId    string    `json:"user_id"`
+	PlanId    int       `json:"plan_id"`
+	PaymentId string    `json:"payment_id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type SubscriptionStore interface {
-	CreateSubscription(userID string, newSubscription CreateSubscriptionPayload) error
-	GetSubscriptionByID(id string) (*Subscription, error)
-	UpdateSubscription(id string, subscription UpdateSubscriptionPayload) error
+	CheckSubscriptionStatus(userID string) (bool, error)
+	GetSubscriptionDetails(userID string) (*Subscription, error)
 }
 
 type User struct {

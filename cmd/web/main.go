@@ -2,14 +2,16 @@ package main
 
 import (
 	"log"
+	"os"
+
+	_ "github.com/joho/godotenv/autoload"
 
 	"github.com/mznrasil/my-blogs-be/internal/storage"
 )
 
-const (
-	PORT           = ":8080"
-	dataSourceName = "host=localhost port=5432 dbname=myblogs user=rasil password="
-)
+const PORT = ":8080"
+
+var dataSourceName = os.Getenv("DATA_SOURCE_NAME")
 
 func main() {
 	log.Println("Connecting to database...")
