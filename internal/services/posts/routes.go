@@ -265,8 +265,8 @@ func (h *Handler) EditPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if post != nil {
-		helpers.WriteJSONError(w, http.StatusNotFound, "Post with this slug already exists.")
+	if post == nil {
+		helpers.WriteJSONError(w, http.StatusNotFound, "Post Not found")
 		return
 	}
 
